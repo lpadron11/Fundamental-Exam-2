@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nursing School Quiz Bank</title>
+<style>
+  :root{
+    --navy:#1b2f3a;
+    --teal:#2f6f6b;
+    --clay:#b5563f;
+    --paper:#f7f5f0;
+    --ink:#1b2f3a;
+    --muted:#5c6b70;
+    --border:#d8d3c6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Iowan Old Style','Georgia',serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .wrap{max-width:800px;margin:0 auto;padding:28px 20px 80px;}
+  header{
+    border-bottom:3px solid var(--navy);
+    padding-bottom:16px;
+    margin-bottom:28px;
+  }
+  h1{font-size:28px;margin:0 0 4px;color:var(--navy);}
+  .sub{font-family:'Helvetica Neue',Arial,sans-serif;font-size:13.5px;color:var(--muted);}
+  h2{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--teal);
+    border-bottom:1.5px solid var(--border);
+    padding-bottom:8px;
+    margin:32px 0 12px;
+  }
+  ul{list-style:none;margin:0;padding:0;}
+  li{margin-bottom:10px;}
+  a.quiz-link{
+    display:block;
+    text-decoration:none;
+    background:#fff;
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    color:var(--ink);
+    font-size:15.5px;
+    font-weight:600;
+    transition:border-color .15s ease;
+  }
+  a.quiz-link:hover{border-color:var(--teal);}
+  a.quiz-link .week{
+    display:block;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--clay);
+    font-weight:700;
+    margin-bottom:4px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Quiz Bank</h1>
+    <div class="sub">Self-study quizzes by course and week</div>
+  </header>
+
+  <h2>N3200 · Fundamentals of Nursing</h2>
+  <ul>
+    <li>
+      <a class="quiz-link" href="quizzes/n3200_week7_quiz.html">
+        <span class="week">Week 7</span>
+        Safety & Security, Bowel Elimination, Sleep & Rest, Pain Assessment
+      </a>
+    </li>
+    <!-- Add new N3200 weeks here, same format -->
+  </ul>
+
+  <!-- Add a new <h2> + <ul> block for each new course, e.g. N3280 -->
+
+</div>
+</body>
+</html>
