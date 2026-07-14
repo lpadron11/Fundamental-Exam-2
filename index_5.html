@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nursing School Quiz Bank</title>
+<style>
+  :root{
+    --navy:#1b2f3a;
+    --teal:#2f6f6b;
+    --teal-light:#e8f2f1;
+    --clay:#b5563f;
+    --paper:#f7f5f0;
+    --ink:#1b2f3a;
+    --muted:#5c6b70;
+    --border:#d8d3c6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Iowan Old Style','Georgia',serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px;}
+  header{
+    border-bottom:3px solid var(--navy);
+    padding-bottom:16px;
+    margin-bottom:28px;
+  }
+  .eyebrow{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--teal);
+    font-weight:700;
+  }
+  h1{
+    font-size:28px;
+    margin:6px 0 4px;
+    color:var(--navy);
+  }
+  .sub{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .controls input, .controls select{
+    font-family:inherit;
+    font-size:13.5px;
+    padding:9px 12px;
+    border:1.5px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+  }
+  .controls input{flex:1;min-width:180px;}
+  .course-block{margin-bottom:36px;}
+  .course-title{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    font-weight:700;
+    color:var(--teal);
+    border-bottom:1.5px solid var(--border);
+    padding-bottom:8px;
+    margin-bottom:14px;
+  }
+  .course-title .full{
+    text-transform:none;
+    letter-spacing:0;
+    color:var(--muted);
+    font-weight:400;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:14px;
+  }
+  .card{
+    display:block;
+    text-decoration:none;
+    background:#fff;
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:16px 16px 14px;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{
+    border-color:var(--teal);
+    transform:translateY(-2px);
+  }
+  .card .week{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--clay);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .card .title{
+    font-size:15.5px;
+    color:var(--ink);
+    font-weight:600;
+    margin-bottom:2px;
+  }
+  .empty{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    color:var(--muted);
+    font-size:14px;
+    padding:20px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">ABSN &middot; Cohort 23</div>
+    <h1>Quiz Bank</h1>
+    <div class="sub">Self-study quizzes by course and week</div>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search by title or week...">
+    <select id="courseFilter">
+      <option value="">All courses</option>
+    </select>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<script>
+async function init(){
+  const content = document.getElementById('content');
+  const search = document.getElementById('search');
+  const courseFilter = document.getElementById('courseFilter');
+  let quizzes = [];
+
+  try{
+    const res = await fetch('quizzes.json');
+    quizzes = await res.json();
+  }catch(e){
+    content.innerHTML = '<div class="empty">Could not load quizzes.json. If you are viewing this file directly from disk, run a local server instead (see README), or check that quizzes.json is in the same folder.</div>';
+    return;
+  }
+
+  // populate course filter
+  const courses = [...new Set(quizzes.map(q => q.course))].sort();
+  courses.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    courseFilter.appendChild(opt);
+  });
+
+  function render(){
+    const term = search.value.trim().toLowerCase();
+    const courseVal = courseFilter.value;
+
+    let filtered = quizzes.filter(q => {
+      const matchesTerm = !term ||
+        q.title.toLowerCase().includes(term) ||
+        String(q.week).includes(term) ||
+        q.course.toLowerCase().includes(term);
+      const matchesCourse = !courseVal || q.course === courseVal;
+      return matchesTerm && matchesCourse;
+    });
+
+    if(filtered.length === 0){
+      content.innerHTML = '<div class="empty">No quizzes match.</div>';
+      return;
+    }
+
+    // group by course
+    const grouped = {};
+    filtered.forEach(q => {
+      if(!grouped[q.course]) grouped[q.course] = [];
+      grouped[q.course].push(q);
+    });
+
+    content.innerHTML = '';
+    Object.keys(grouped).sort().forEach(course => {
+      const items = grouped[course].sort((a,b) => b.week - a.week);
+      const block = document.createElement('div');
+      block.className = 'course-block';
+
+      const courseName = items[0].courseName || '';
+      block.innerHTML = `<div class="course-title">${course} <span class="full">${courseName ? '&middot; ' + courseName : ''}</span></div>`;
+
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      items.forEach(q => {
+        const a = document.createElement('a');
+        a.className = 'card';
+        a.href = q.file;
+        a.innerHTML = `
+          <div class="week">Week ${q.week}</div>
+          <div class="title">${q.title}</div>
+        `;
+        grid.appendChild(a);
+      });
+
+      block.appendChild(grid);
+      content.appendChild(block);
+    });
+  }
+
+  search.addEventListener('input', render);
+  courseFilter.addEventListener('change', render);
+  render();
+}
+init();
+</script>
+</body>
+</html>
